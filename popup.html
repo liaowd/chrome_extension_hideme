@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 300px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #333;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .header h1 { font-size: 16px; font-weight: 600; }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #ccc;
+      transition: background 0.2s;
+    }
+    .status-dot.on { background: #22c55e; box-shadow: 0 0 6px #22c55e66; }
+    .status-dot.off { background: #ef4444; }
+    .switch-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .switch-label { font-weight: 500; }
+    .toggle {
+      position: relative;
+      width: 44px; height: 24px;
+      background: #e5e7eb;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle.on { background: #22c55e; }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle.on::after { transform: translateX(20px); }
+    .target-info {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #666;
+    }
+    .target-info strong { color: #333; display: block; margin-bottom: 6px; }
+    .target-tag {
+      display: inline-block;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin: 0 4px 4px 0;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 8px;
+    }
+    .btn-primary {
+      background: #111827;
+      color: white;
+    }
+    .btn-primary:hover { background: #374151; }
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .btn-danger:hover { background: #fecaca; }
+    .shortcut-hint {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+      font-size: 11px;
+      color: #999;
+      text-align: center;
+    }
+    .shortcut-hint kbd {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      border: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="status-dot" id="statusDot"></div>
+    <h1>HideMe 隐私保护</h1>
+  </div>
+
+  <div class="switch-row">
+    <span class="switch-label">总开关</span>
+    <div class="toggle" id="mainToggle"></div>
+  </div>
+
+  <div class="target-info">
+    <strong>目标页面</strong>
+    <div id="targetUrls"></div>
+  </div>
+
+  <button class="btn btn-danger" id="emergencyBtn">紧急覆盖 (Boss Key)</button>
+  <button class="btn btn-primary" id="optionsBtn">打开详细设置</button>
+
+  <div class="shortcut-hint">
+    <kbd>Ctrl+Shift+H</kbd> 快速开关<br>
+    <kbd>Ctrl+Shift+U</kbd> 紧急覆盖
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
