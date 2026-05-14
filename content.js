@@ -113,16 +113,15 @@
       border: 'none'
     });
 
-    const iframe = document.createElement('iframe');
-    iframe.src = url;
-    Object.assign(iframe.style, {
+    const div = document.createElement('div');
+    div.src = url;
+    Object.assign(div.style, {
       width: '100%', height: '100%',
       border: 'none'
     });
-    coverEl.appendChild(iframe);
+    coverEl.appendChild(div);
 
     coverEl.addEventListener('click', () => {
-      debugger
       uncover();
     });
 
@@ -220,7 +219,7 @@
         }
       }
       // Note: we intentionally do NOT uncover on focus gain here.
-      // document.hasFocus() returns true when the cover iframe has focus,
+      // document.hasFocus() returns true when the cover div has focus,
       // which would cause an uncover→cover oscillation. Uncovering is
       // handled by the window 'focus' event instead.
       lastFocused = currentlyFocused;
