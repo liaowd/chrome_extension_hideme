@@ -10,10 +10,6 @@
   let lastCoverTime = 0;
   let lastUncoverTime = 0;
 
-  function log(...args) {
-    console.log('[HideMe]', ...args);
-  }
-
   function matchUrl(url, patterns) {
     if (!patterns || patterns.length === 0) return false;
 
@@ -48,7 +44,7 @@
 
   function isTargetPage() {
     const result = config && config.enabled && matchUrl(location.href, config.targetUrls);
-    log('isTargetPage', { href: location.href, enabled: config?.enabled, result });
+    console.log('isTargetPage', { href: location.href, enabled: config?.enabled, result });
     return result;
   }
 
@@ -98,9 +94,12 @@
   }
 
   function createCover() {
-    if (coverEl) return;
+    if (coverEl) {
+      coverEl.remove();
+      coverEl = null;
+    }
     const url = pickFakePage();
-    log('createCover', url);
+    console.log('createCover', url);
 
     coverEl = document.createElement('div');
     coverEl.id = 'hideme-cover';
@@ -155,27 +154,28 @@
   }
 
   function cover() {
-    log('cover called', { isTarget: isTargetPage(), isCovered });
-    if (!isTargetPage() || isCovered) return;
+    // console.log('cover called', { isTarget: isTargetPage(), isCovered });
+    // if (!isTargetPage() || isCovered) return;
     createCover();
   }
 
   function uncover() {
-    if (!isCovered) return;
+    // if (!isCovered) return;
     removeCover();
   }
 
   const DEBOUNCE_MS = 400;
 
-  function handleBlur() {
-    log('blur event');
-    if (config?.blurProtection && Date.now() - lastUncoverTime > DEBOUNCE_MS) {
-      cover();
-    }
-  }
+  // function handleBlur() {
+  //   console.log('blur event');
+  //   return;
+  //   if (config?.blurProtection && Date.now() - lastUncoverTime > DEBOUNCE_MS) {
+  //     cover();
+  //   }
+  // }
 
   function handleVisibilityChange() {
-    log('visibilitychange', document.hidden);
+    console.log('visibilitychange', document.hidden);
     if (document.hidden) {
       if (config?.blurProtection) cover();
     } else {
@@ -207,28 +207,25 @@
     }
   }
 
-  function startFocusCheck() {
-    if (checkInterval) return;
-    let lastFocused = document.hasFocus();
-    checkInterval = setInterval(() => {
-      const currentlyFocused = document.hasFocus();
-      if (lastFocused && !currentlyFocused) {
-        log('focusCheck: lost focus');
-        if (config?.blurProtection && Date.now() - lastUncoverTime > DEBOUNCE_MS) {
-          cover();
-        }
-      }
-      // Note: we intentionally do NOT uncover on focus gain here.
-      // document.hasFocus() returns true when the cover div has focus,
-      // which would cause an uncover→cover oscillation. Uncovering is
-      // handled by the window 'focus' event instead.
-      lastFocused = currentlyFocused;
-    }, 200);
-  }
+  // function startFocusCheck() {
+  //   if (checkInterval) return;
+  //   let lastFocused = document.hasFocus();
+  //   checkInterval = setInterval(() => {
+  //     const currentlyFocused = document.hasFocus();
+  //     console.log('focusCheck: ', lastFocused, currentlyFocused );
+  //     if (lastFocused && !currentlyFocused) {
+  //       console.log('focusCheck: lost focus');
+  //       if (config?.blurProtection && Date.now() - lastUncoverTime > DEBOUNCE_MS) {
+  //         cover();
+  //       }
+  //     }
+  //     lastFocused = currentlyFocused;
+  //   }, 200);
+  // }
 
   function applyConfig(newConfig) {
     config = newConfig;
-    log('config loaded', { targetUrls: config?.targetUrls, enabled: config?.enabled, blurProtection: config?.blurProtection });
+    console.log('config loaded', { targetUrls: config?.targetUrls, enabled: config?.enabled, blurProtection: config?.blurProtection });
     if (!config.enabled && isCovered) {
       uncover();
     }
@@ -236,7 +233,7 @@
   }
 
   function init() {
-    log('init', location.href);
+    console.log('init', location.href);
     chrome.storage.sync.get([
       'enabled', 'targetUrls', 'fakePages', 'blurProtection',
       'mouseLeaveProtection', 'cornerProtection', 'cornerSize',
@@ -245,22 +242,22 @@
       applyConfig(result);
     });
 
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('focus', () => {
-      log('focus event');
-      if (config?.autoRestore && Date.now() - lastCoverTime > DEBOUNCE_MS) {
-        uncover();
-      }
-    });
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('keydown', handleKeydown);
+    // window.addEventListener('blur', handleBlur);
+    // window.addEventListener('focus', () => {
+    //   console.log('focus event');
+    //   if (config?.autoRestore && Date.now() - lastCoverTime > DEBOUNCE_MS) {
+    //     uncover();
+    //   }
+    // });
+    // document.addEventListener('visibilitychange', handleVisibilityChange);
+    // document.addEventListener('mousemove', handleMouseMove);
+    // document.addEventListener('mouseleave', handleMouseLeave);
+    // document.addEventListener('keydown', handleKeydown);
 
-    startFocusCheck();
+    // startFocusCheck();
 
     chrome.runtime.onMessage.addListener((msg) => {
-      log('message', msg);
+      console.log('message', msg);
       if (msg.action === 'toggle') {
         config.enabled = msg.enabled;
         if (!config.enabled && isCovered) uncover();
@@ -279,6 +276,24 @@
       if (!config.enabled && isCovered) uncover();
       updateIndicator();
     });
+
+
+
+
+
+
+
+      checkInterval = setInterval(() => {
+        const currentlyFocused = document.hasFocus();
+        if (currentlyFocused){
+          coverEl && coverEl.remove();
+        }else{
+          cover();
+        }
+      }, 2000);
+
+
+
   }
 
   if (document.readyState === 'loading') {
